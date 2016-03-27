@@ -1,3 +1,5 @@
+.precomp
+*~
 /blib/
 /.build/
 _build/
