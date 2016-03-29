@@ -70,6 +70,26 @@ class Time::Crontab::Set {
     }
 
     method will-ever-execute() {
-        return so [|] %!value.values;
+        return any( %!value.values ) == True;
+    }
+    method all-enabled {
+        return all( %!value.values ) == True;
+    }
+
+    multi method next(Int $offset) {
+        my Int $distance = 0;
+        my $ret = samewith($offset, $distance);
+        return $ret;
+    }
+    multi method next(Int $offset, Int $distance is rw) {
+        for ($offset+1 .. $!stop) {
+            $distance++;
+            return $_ if %!value{$_};
+        }
+        for ($!start .. $offset) {
+            $distance++;
+            return $_ if %!value{$_};
+        }
+        return Int;
     }
 }

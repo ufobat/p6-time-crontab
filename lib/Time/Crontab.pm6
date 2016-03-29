@@ -26,6 +26,7 @@ class Time::Crontab {
     }
     
     multi method match(DateTime $datetime, Bool :$truncate = False) {
+        my $dt = $datetime.in-timezone($.timezone);
         unless $!minute.contains($datetime.minute) {
             #say "minutes missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
             return False;
@@ -50,7 +51,7 @@ class Time::Crontab {
             # don't care for seconds or even smaller fractions of seconds
             return True;
         }else{
-            if $datetime.truncated-to('minute') eqv $datetime {
+            if $datetime.truncated-to('minute') == $datetime {
                 #say "$datetime matches the exact minute";
                 return True;
             }

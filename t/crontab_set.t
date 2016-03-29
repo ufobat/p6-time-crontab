@@ -8,10 +8,11 @@ plan 5;
 
 sub run-test-for(Time::Crontab::Set::Type $type, Int $min, Int $max) {
     subtest {
-        plan 9;
+        plan 11;
         diag $type;
         my $set = Time::Crontab::Set.new(type => $type);
         nok($set.will-ever-execute(), "a new set for $type, with initial values, will-never-execute()");
+        nok($set.all-enabled(), "a new set for $type, with initial values, will not have all-enabled()");
         my $list;
         $list{$_} = False for ($min..$max);
         is-deeply($set.hash, $list, 'everything is false');
@@ -26,6 +27,9 @@ sub run-test-for(Time::Crontab::Set::Type $type, Int $min, Int $max) {
         dies-ok(sub {$set.enable($max+1) }, "enabling element higher than possible fails");
         lives-ok(sub {$set.enable($min) }, "enabling minimal element");
         lives-ok(sub {$set.enable($max) }, "enabling maximal element");
+
+        $set.enable-any();
+        ok($set.all-enabled(), "we will have all-enabled() after enabling all");
     }
 }
 
