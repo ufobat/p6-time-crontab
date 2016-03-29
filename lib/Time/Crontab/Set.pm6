@@ -82,6 +82,7 @@ class Time::Crontab::Set {
         return $ret;
     }
     multi method next(Int $offset, Int $distance is rw) {
+        $distance = 0;
         for ($offset+1 .. $!stop) {
             $distance++;
             return $_ if %!value{$_};

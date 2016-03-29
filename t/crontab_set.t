@@ -8,7 +8,7 @@ plan 5;
 
 sub run-test-for(Time::Crontab::Set::Type $type, Int $min, Int $max) {
     subtest {
-        plan 11;
+        plan 15;
         diag $type;
         my $set = Time::Crontab::Set.new(type => $type);
         nok($set.will-ever-execute(), "a new set for $type, with initial values, will-never-execute()");
@@ -19,6 +19,17 @@ sub run-test-for(Time::Crontab::Set::Type $type, Int $min, Int $max) {
         $set.enable(5);
         ok($set.contains(5), 'element 5 is enabled');
         ok($set.will-ever-execute(), "but it will execute after 5 is enabled");
+
+        my Int $distance = 0;
+        my $next = $set.next(3, $distance);
+        is($next, 5, "next to 3 is 5");
+        is($distance, 2, "which is 2 steps ahead");
+
+        $next = $set.next(6, $distance);
+        is($next, 5, "next to 6 is 5");
+
+        my $expected-distance = ($max - $min - (6-5)) + 1; # 6 := start, 5 := expected
+        is($distance, $expected-distance, "which is $expected-distance ahead");
 
         $list{5} = True;
         is-deeply($set.hash, $list, '5th element of the list is true');
