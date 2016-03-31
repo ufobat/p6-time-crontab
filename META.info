@@ -1,5 +1,5 @@
 {
-	"perl" : "6",
+        "perl" : "6.c",
         "name" : "Time::Crontab",
         "version" : "0.0.1",
         "description" : "Time::Crontab for Perl6 - Parses Crontab Specifications",
@@ -10,6 +10,6 @@
             "Time::Crontab::Grammar" : "lib/Time/Crontab/Grammar.pm6",
             "Time::Crontab::Set" : "lib/Time/Crontab/Set.pm6"
         },
-	"depends" : [ "Test::META" ],
+        "depends" : [ "Test::META" ],
         "source-url" : "https://github.com/ufobat/p6-time-crontab.git"
 }
