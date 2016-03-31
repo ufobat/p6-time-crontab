@@ -28,15 +28,15 @@ class Time::Crontab {
     multi method match(DateTime $datetime, Bool :$truncate = False) {
         my $dt = $datetime.in-timezone($.timezone);
         unless $!minute.contains($datetime.minute) {
-            say "minutes missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+            #say "minutes missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
             return False;
         }
         unless $!hour.contains($datetime.hour) {
-            say "hours missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+            #say "hours missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
             return False;
         }
         unless $!month.contains($datetime.month) {
-            say "month missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+            #say "month missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
             return False;
         }
 
@@ -46,19 +46,19 @@ class Time::Crontab {
         }elsif $!dow.all-enabled && ! $!dom.all-enabled {
             # just check dom
             unless $!dom.contains($datetime.day-of-month) {
-                say "dom missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+                #say "dom missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
                 return False;
             }
         }elsif ! $!dow.all-enabled && $!dom.all-enabled {
             # just check dow
             unless $!dow.contains($datetime.day-of-week % 7) { # %7 to make sunday (7th day) to the 0th day ;)
-                say "dow missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+                #say "dow missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
                 return False;
             }
         }else {
             # check both
             unless $!dom.contains($datetime.day-of-month) ||  $!dow.contains($datetime.day-of-week % 7) {
-                say "dom/dow missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+                #say "dom/dow missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
                 return False;
             }
         }
