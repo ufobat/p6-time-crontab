@@ -4,7 +4,7 @@ use lib 'lib';
 use Test;
 use Time::Crontab;
 
-plan 21;
+plan 40;
 
 sub get-datetime {
     my $dt = DateTime.now(:timezone(0));
@@ -57,3 +57,23 @@ cron-ok(   '0 0 13 * 5',      0, 0,  6, 12, 2013); # defined day and dow => day 
 cron-notok('0 0 13 * *',      0, 0,  12, 8, 2013); # 12th Aug still doesn't match 13th (not just because dow is any).
 cron-ok(   '0 10 10,31 * 2',  0, 10, 10, 3, 2016); # 2016-03-10T10:00:00Z matches the 10th dom (but not the 2nd dow)
 
+cron-notok('0 0 * * sun',       0, 0, 13,  8, 2013);
+cron-notok('0 0 * * MON',       0, 0, 13,  8, 2013);
+cron-ok(   '0 0 * * Tue',       0, 0, 13,  8, 2013);
+cron-notok('0 0 * * WeD',       0, 0, 13,  8, 2013);
+cron-notok('0 0 * * thU',       0, 0, 13,  8, 2013);
+cron-notok('0 0 * * FRI',       0, 0, 13,  8, 2013);
+cron-notok('0 0 * * SAT',       0, 0, 13,  8, 2013);
+
+cron-ok(   '0 0 13 JAN 7',      0, 0, 13,  1, 2013);
+cron-ok(   '0 0 13 feb 7',      0, 0, 13,  2, 2013);
+cron-ok(   '0 0 13 Mar 7',      0, 0, 13,  3, 2013);
+cron-ok(   '0 0 13 aPR 7',      0, 0, 13,  4, 2013);
+cron-ok(   '0 0 13 mAy 7',      0, 0, 13,  5, 2013);
+cron-ok(   '0 0 13 JuN 7',      0, 0, 13,  6, 2013);
+cron-ok(   '0 0 13 jul 7',      0, 0, 13,  7, 2013);
+cron-ok(   '0 0 13 aug 7',      0, 0, 13,  8, 2013);
+cron-ok(   '0 0 13 sep 7',      0, 0, 13,  9, 2013);
+cron-ok(   '0 0 13 oct 7',      0, 0, 13, 10, 2013);
+cron-ok(   '0 0 13 nov 7',      0, 0, 13, 11, 2013);
+cron-ok(   '0 0 13 dec 7',      0, 0, 13, 12, 2013);

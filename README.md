@@ -20,6 +20,23 @@ METHODS
 
 Matches the $datetime against the crontab specification. Since the crontab's smallest granulation is minute wise there is a option to $truncate the $datetime to minutes when it comes to consideration if the $datetime matches the $crontab.
 
+SYNTAX OF THE CRONTAB
+=====================
+
+    Field name   Allowed values  Allowed special characters
+    Minutes      0-59            * / , - !
+    Hours        0-23            * / , - !
+    Day of month 1-31            * / , - !
+    Month        1-12 or JAN-DEC * / , - !
+    Day of week  0-6 or SUN-SAT  * / , - !
+
+    * `*` means anything. The actual values depends on the field.
+    * `/` is a stepping. This special character must be followed bit a number, which decribes the step size.
+    * `,` can be used to list different values, or ranges.
+    * `-` indicates a range.
+    * `!` excludes a value.
+
+The names of the month or day of the week are the first 3 characters of their english names. They are case insensetive.
 
 DAY OF MONTH VS DAY OF WEEK
 ===========================

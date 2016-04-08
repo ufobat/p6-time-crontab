@@ -55,7 +55,14 @@ grammar Time::Crontab::Grammar {
     regex minute-value { \d               | <[ 0 .. 5 ]> \d }
     regex hour-value   { \d               | <[ 0 1 ]> \d    | 2 <[ 0 .. 3 ]>}
     regex dom-value    { 0? <[ 1 .. 9]>   | <[ 1 2 ]> \d    | 30 | 31 }
-    regex month-value  { 0? <[ 1 .. 9 ]>  | 10 | 11 | 12    }
-    regex dow-value    { <[0 .. 7]> }
+
+    regex month-value  { <month-number> | <month-name> }
+    regex dow-value    { <dow-number>   | <dow-name> }
+
+    regex month-number { 0? <[ 1 .. 9 ]>  | 10 | 11 | 12 }
+    regex dow-number   { <[0 .. 7]> }
+
+    regex month-name   { :i jan | feb | mar | apr | may | jun | jul | aug | sep | oct | nov | dec }
+    regex dow-name     { :i mon | tue | wed | thu | fri | sat | sun }
 
 }

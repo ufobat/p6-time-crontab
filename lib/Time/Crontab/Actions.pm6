@@ -2,12 +2,40 @@ use Time::Crontab::Set;
 
 class Time::Crontab::Actions {
 
-    method dow-value($/) { $/.make: +$/ % 7 }
+    my %dow-map = (
+        sun => 0,
+        mon => 1,
+        tue => 2,
+        wed => 3,
+        thu => 4,
+        fri => 5,
+        sat => 6,
+    );
+    my %month-map = (
+        jan => 1,
+        feb => 2,
+        mar => 3,
+        apr => 4,
+        may => 5,
+        jun => 6,
+        jul => 7,
+        aug => 8,
+        sep => 9,
+        oct => 10,
+        nov => 11,
+        dec => 12,
+    );
+
+    method dow-number($/) { $/.make: +$/ % 7 }
+    method dow-name($/) { $/.make: + %dow-map{ lc(~$/) } }
+    method dow-value($/) { $/.make: $/<dow-number>.made // $/<dow-name>.made }
     method dows($/) {
         $/.make: self!make_node(Time::Crontab::Set::Type::dow, $/);
     }
 
-    method month-value($/) { $/.make: +$/ }
+    method month-number($/) { $/.make: +$/ }
+    method month-name($/) { $/.make: + %month-map{ lc(~$/) } }
+    method month-value($/) { $/.make: $/<month-number>.made // $/<month-name>.made }
     method months($/) {
         $/.make: self!make_node(Time::Crontab::Set::Type::month, $/);
     }
