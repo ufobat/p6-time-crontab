@@ -2,7 +2,7 @@ enum Time::Crontab::Set::Type<minute hour dom month dow>;
 
 class Time::Crontab::Set {
     has Int $!start;
-    has Int $!stop; 
+    has Int $!stop;
     has Bool %!value;
 
     method new(Time::Crontab::Set::Type :$type!) {
@@ -34,7 +34,7 @@ class Time::Crontab::Set {
     method !check-num(Int $num) {
         die "$num must be between $!start and $!stop" unless $!start <= $num <= $!stop;
     }
-    
+
     method disable (Int $num) {
         self!check-num($num);
         %!value{$num} = False;

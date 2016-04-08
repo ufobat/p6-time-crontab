@@ -13,18 +13,18 @@ class Time::Crontab {
     has Time::Crontab::Set $!dom;
     has Time::Crontab::Set $!month;
     has Time::Crontab::Set $!dow;
-    
+
     submethod BUILD(:$!crontab!, :$!timezone = 0)  {
         my $actions = Time::Crontab::Actions.new();
         my $bean = Time::Crontab::Grammar.parse($!crontab, :$actions).made;
         die "$!crontab is syntactically wrong" unless $bean;
         ($!minute, $!hour, $!dom, $!month, $!dow) = $bean;
     }
-    
+
     multi method match(Int $posix) {
         return self.match(DateTime.new($posix, :$.timezone));
     }
-    
+
     multi method match(DateTime $datetime, Bool :$truncate = False) {
         my $dt = $datetime.in-timezone($.timezone);
         unless $!minute.contains($datetime.minute) {

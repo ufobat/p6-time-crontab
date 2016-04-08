@@ -16,7 +16,7 @@ class Time::Crontab::Actions {
     method doms($/) {
         $/.make: self!make_node(Time::Crontab::Set::Type::dom, $/);
     }
-    
+
     method hour-value($/) { $/.make: +$/ }
     method hours($/) {
         $/.make: self!make_node(Time::Crontab::Set::Type::hour, $/);
