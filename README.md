@@ -3,7 +3,7 @@
 NAME
 ====
 
-Time::Crontab for perl6
+Time::Crontab for raku
 
 SYNOPSIS
 ========
