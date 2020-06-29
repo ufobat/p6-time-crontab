@@ -9,8 +9,8 @@ plan 5;
 sub run-test-for(Time::Crontab::Set::Type $type, Int $min, Int $max) {
     subtest {
         plan 15;
-        diag $type;
-        my $set = Time::Crontab::Set.new(type => $type);
+
+	my $set = Time::Crontab::Set.new(type => $type);
         nok($set.will-ever-execute(), "a new set for $type, with initial values, will-never-execute()");
         nok($set.all-enabled(), "a new set for $type, with initial values, will not have all-enabled()");
         my Bool %list;
