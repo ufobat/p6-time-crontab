@@ -20,3 +20,5 @@ nytprof.out
 *.o
 *.bs
 /_eumm/
+.idea
+p6-time-crontab.iml

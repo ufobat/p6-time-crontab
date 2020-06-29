@@ -1,6 +1,5 @@
 use v6;
 
-unit module Time::Crontab;
 use Time::Crontab::Grammar;
 use Time::Crontab::Actions;
 use Time::Crontab::Set;
@@ -28,15 +27,15 @@ class Time::Crontab {
     multi method match(DateTime $datetime, Bool :$truncate = False) {
         my $dt = $datetime.in-timezone($.timezone);
         unless $!minute.contains($datetime.minute) {
-            #say "minutes missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+            #say "minutes mismatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
             return False;
         }
         unless $!hour.contains($datetime.hour) {
-            #say "hours missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+            #say "hours mismatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
             return False;
         }
         unless $!month.contains($datetime.month) {
-            #say "month missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+            #say "month mismatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
             return False;
         }
 
@@ -46,19 +45,19 @@ class Time::Crontab {
         }elsif $!dow.all-enabled && ! $!dom.all-enabled {
             # just check dom
             unless $!dom.contains($datetime.day-of-month) {
-                #say "dom missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+                #say "dom mismatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
                 return False;
             }
         }elsif ! $!dow.all-enabled && $!dom.all-enabled {
             # just check dow
             unless $!dow.contains($datetime.day-of-week % 7) { # %7 to make sunday (7th day) to the 0th day ;)
-                #say "dow missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+                #say "dow mismatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
                 return False;
             }
         }else {
             # check both
             unless $!dom.contains($datetime.day-of-month) ||  $!dow.contains($datetime.day-of-week % 7) {
-                #say "dom/dow missmatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
+                #say "dom/dow mismatch: date = {$datetime.minute} vs parsed crontab = { $!minute.hash{$datetime.minute}:kv }";
                 return False;
             }
         }
@@ -83,20 +82,25 @@ class Time::Crontab {
             my $month  = .month;
             my $year   = .year;
 
+            loop {
+                my $old-minute = $minute;
+                $minute = $!minute.next($old-minute);
 
-            $minute = $!minute.next(.minute);
-            if $minute <= .minute
-            || !self.match(DateTime.new(:seconds(0), :$minute, :$hour, :$day, :$month, :$year, :$.timezone)) {
-                $hour = $!hour.next(.hour);
-                if $hour <= .hour
-                || !self.match(DateTime.new(:seconds(0), :$minute, :$hour, :$day, :$month, :$year, :$.timezone)) {
+                if $minute <= $old-minute {
+                    my $old-hour = $hour;
 
-                    # always keep $day and $day-of-week up to date!
-                    my $day-of-week = .day-of-week;
-                    repeat {
-                        my $old-day = $day;
+                    # reset all "smaller" time slots and set new $hour
+                    $minute = 0;
+                    $hour = $!hour.next($old-hour);
+
+                    if $hour <= $old-hour {
+
+                        # always keep $day and $day-of-week up to date!
+                        # sunday is not the 7th but the 0th dow.
+                        my $day-of-week = Date.new(:$year, :$month, :$day).day-of-week % 7;
                         my $distance-next-dom = 0;
                         my $distance-next-dow = 0;
+                        my $old-day = $day;
                         my $next-dom = $!dom.next($day, $distance-next-dom);
                         my $next-dow = $!dow.next($day-of-week, $distance-next-dow);
 
@@ -105,33 +109,50 @@ class Time::Crontab {
                         # else whatever is sooner:
                         #   if the dow comes before dom   -> use the dow way.
                         #   if the dom comes before dow   -> use the dow way.
-                        if $!dow.all-enabled && ! $!dom.all-enabled {
-                            self!apply-the-dom-way(:$day, :$day-of-week, :$old-day, :$next-dom, :$distance-next-dom);
-                        } elsif ! $!dow.all-enabled && $!dom.all-enabled {
-                            self!apply-the-dow-way(:$day, :$day-of-week, :$old-day, :$distance-next-dow, :$month, :$year, :$next-dow);
+                        if $!dow.all-enabled && !$!dom.all-enabled {
+                            self!apply-the-dom-way(:$day, :$day-of-week, :$old-day, :$next-dom,
+                                    :$distance-next-dom);
+                        } elsif !$!dow.all-enabled && $!dom.all-enabled {
+                            self!apply-the-dow-way(:$day, :$day-of-week, :$old-day, :$distance-next-dow, :$month,
+                                    :$year, :$next-dow);
                         } elsif $distance-next-dow < $distance-next-dom {
-                            self!apply-the-dow-way(:$day, :$day-of-week, :$old-day, :$distance-next-dow, :$month, :$year, :$next-dow);
+                            self!apply-the-dow-way(:$day, :$day-of-week, :$old-day, :$distance-next-dow, :$month,
+                                    :$year, :$next-dow);
                         } else {
-                            self!apply-the-dom-way(:$day, :$day-of-week, :$old-day, :$next-dom, :$distance-next-dom);
-                        }
-
-                        # whoa! our $day is smaller as it used before, eeeks! new-month-code!
-                        if $day <= $old-day {
-                                $month = $!month.next($month);
-                                if $month <= .month {
-                                    $year++;
-                                }
+                            self!apply-the-dom-way(:$day, :$day-of-week, :$old-day, :$next-dom,
+                                    :$distance-next-dom);
                         }
 
                         # WAIT! WHAT?
-                        # Maybe the $day doesnt fit in the new month! EEEKS!
+                        # Maybe the $day doesn't fit in the new month! EEEKS!
                         # e.g. for $crontab = '0 10 31 * *'    - next to 2016-03-31T11:00:00Z is 2016-05-31T10:00:00Z => there is no 31th of April
                         # e.g. for $crontab = '* * * * *'      - next to 2016-04-30T23:59:00Z is 2016-05-01T00:00:00Z => there is still no 31th of April
                         # e.g. for $crontab = '0 10 10,31 * 2' - next to 2016-04-29T14:11:00Z is 2016-05-03T10:00:00Z => 1st would be 31th april, since its closer then the dow, but then eeeks!
-                    } until $day <= Date.new(:$year, :$month).days-in-month;
+
+                        if $day > Date.new(:$year, :$month).days-in-month() {
+                            $day = 1;
+                        }
+
+                        # reset the "smaller" times slots
+                        $hour = $minute = 0;
+
+                        # whoa! our $day is smaller as it used before, eeeks! new-month-code!
+                        if $day <= $old-day {
+                            my $old_month = $month;
+                            $month = $!month.next($old_month);
+                            $day = 1;
+                            $hour = $minute = 0;
+                            if $month <= $old_month {
+                                $year++;
+                                $month = $day = 1;
+                                $hour = $minute = 0;
+                            }
+                        }
+                    }
                 }
+                my $next-datetime = DateTime.new(:seconds(0), :$minute, :$hour, :$day, :$month, :$year, :$.timezone);
+                return $next-datetime if self.match($next-datetime);
             }
-            return DateTime.new(:seconds(0), :$minute, :$hour, :$day, :$month, :$year, :$.timezone);
         }
     }
 
