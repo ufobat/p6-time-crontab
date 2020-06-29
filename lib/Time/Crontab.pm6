@@ -4,7 +4,7 @@ use Time::Crontab::Grammar;
 use Time::Crontab::Actions;
 use Time::Crontab::Set;
 
-class Time::Crontab {
+class Time::Crontab:ver<1.0.0> {
     has Int $.timezone;
     has Str $.crontab;
     has Time::Crontab::Set $!minute;
