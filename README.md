@@ -49,7 +49,7 @@ DAY OF MONTH VS DAY OF WEEK
 
 The Handling of the Day of Week and Day of Month is quite delicate. In the case that the Day of Week field is set to any (*) you basically dont care for it.
 
-This is borrowd from the crontab 5 manpage
+This is borrowed from the crontab 5 manpage
 
      Note: The day of a command's execution can be specified by two fields — day of month, and day of week.  If both fields are restricted (i.e., aren't *), the command  will  be
      run when either field matches the current time.  For example,
